@@ -1,0 +1,52 @@
+# Maven build artifacts
+target/
+!target/library-management-1.0.0.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Test reports and logs
+*.log
+load-test-report-*.txt
+aws-ec2-load-test-report-*.txt
+comprehensive-load-test-report-*.txt
+
+# Scripts
+*.ps1
+*.sh
+*.bat
+
+# Docker files (except main Dockerfile)
+docker-compose*.yml
+Dockerfile.*
+
+# Monitoring configuration
+monitoring/
+
+# Frontend (if serving separately)
+frontend/
+
+# Environment files
+.env
+.env.local
+
+# Maven wrapper (optional - uncomment if you want to exclude)
+# .mvn/
+# mvnw
+# mvnw.cmd

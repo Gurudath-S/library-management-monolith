@@ -1,0 +1,11 @@
+ISBN,Title,Author,Category,Publisher,TotalCopies,Price,PublicationYear,Pages,Language,Description
+978-0134685992,Spring Boot in Action,Craig Walls,Programming,Manning Publications,5,49.99,2015,424,English,Comprehensive guide to Spring Boot framework
+978-1491950357,Learning React,Alex Banks,Programming,O'Reilly Media,7,39.99,2017,350,English,Modern patterns for developing React apps
+978-1449355739,MongoDB: The Definitive Guide,Kristina Chodorow,Database,O'Reilly Media,4,45.99,2013,432,English,Powerful and scalable data storage
+978-0596517748,JavaScript: The Good Parts,Douglas Crockford,Programming,O'Reilly Media,8,29.99,2008,176,English,Distilling JavaScript to its essential parts
+978-0321125215,Domain-Driven Design,Eric Evans,Software Engineering,Addison-Wesley Professional,6,54.99,2003,560,English,Tackling complexity in the heart of software
+978-0134494166,Clean Code,Robert C. Martin,Programming,Prentice Hall,10,42.99,2008,464,English,A handbook of agile software craftsmanship
+978-1617294945,Spring in Action,Craig Walls,Programming,Manning Publications,9,49.99,2018,520,English,Spring Framework development guide
+978-0596809485,Beautiful Code,Andy Oram,Programming,O'Reilly Media,3,39.99,2007,618,English,Leading programmers explain how they think
+978-0134757599,Refactoring,Martin Fowler,Programming,Addison-Wesley Professional,5,54.99,2018,448,English,Improving the design of existing code
+978-0201633610,Design Patterns,Erich Gamma,Programming,Addison-Wesley Professional,7,59.99,1994,395,English,Elements of reusable object-oriented software
