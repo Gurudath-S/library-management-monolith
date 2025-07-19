@@ -1,0 +1,26 @@
+﻿Library Management System Load Test Report
+Generated: 07/19/2025 22:37:54
+
+TEST CONFIGURATION:
+Base URL: http://13.235.83.165:8080
+Total Requests: 200
+Test Duration: 17.4 seconds
+
+RESULTS SUMMARY:
+Total Requests: 200
+Successful Requests: 200 (100%)
+Failed Requests: 0
+Throughput: 11.5 requests/second
+
+RESPONSE TIME STATISTICS:
+Average: 86.3 ms
+Minimum: 45 ms
+Maximum: 343 ms
+
+ENDPOINT PERFORMANCE:
+Available Books: 33/33 (100%) - 69.2 ms average
+Books (Public): 34/34 (100%) - 76.9 ms average
+Categories: 33/33 (100%) - 65 ms average
+Health: 34/34 (100%) - 61.4 ms average
+Metrics: 33/33 (100%) - 53.5 ms average
+Prometheus: 33/33 (100%) - 192.9 ms average
