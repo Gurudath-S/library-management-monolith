@@ -7,10 +7,10 @@ rule_files:
   # - "second_rules.yml"
 
 scrape_configs:
-  # Library Management System
+  # Library Management System - Updated for Docker networking
   - job_name: 'library-management'
     static_configs:
-      - targets: ['host.docker.internal:8080']
+      - targets: ['library-app:8080']
     metrics_path: '/actuator/prometheus'
     scrape_interval: 5s
     params:
@@ -20,3 +20,10 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+
+  # Zipkin metrics
+  - job_name: 'zipkin'
+    static_configs:
+      - targets: ['zipkin:9411']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 15s

@@ -1,5 +1,5 @@
 # Multi-stage build for Library Management System
-FROM maven:3.9-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-22 AS build
 
 # Set working directory
 WORKDIR /app
@@ -17,16 +17,14 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage - use smaller JRE image
-FROM openjdk:17-jdk-slim AS runtime
+FROM eclipse-temurin:22-jre-alpine AS runtime
 
 # Install curl for health checks and clean up in same layer
-RUN apt-get update && \
-    apt-get install -y curl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl
 
 # Create app user for security (don't run as root)
-RUN addgroup --system appgroup && \
-    adduser --system --group appuser
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
 
 # Set working directory
 WORKDIR /app
