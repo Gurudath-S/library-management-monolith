@@ -47,7 +47,7 @@ public class Transaction {
     }
     
     public enum TransactionStatus {
-        ACTIVE, COMPLETED, OVERDUE, CANCELLED
+        ACTIVE, COMPLETED, OVERDUE, CANCELLED, RETURNED
     }
     
     @PrePersist

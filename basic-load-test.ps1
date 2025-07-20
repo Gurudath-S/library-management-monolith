@@ -1,6 +1,6 @@
 # Basic Load Test Script for Library Management System
 
-$BaseUrl = "http://localhost:8080"
+$BaseUrl = "http://13.235.83.165:8080"
 $TotalRequests = 200
 
 Write-Host "Library Management System Load Test" -ForegroundColor Green
@@ -11,7 +11,7 @@ Write-Host ""
 # Check if application is running
 Write-Host "Checking application health..." -ForegroundColor Yellow
 try {
-    $health = Invoke-RestMethod -Uri "http://localhost:8080/actuator/health" -TimeoutSec 5
+    $health = Invoke-RestMethod -Uri "http://13.235.83.165:8080/actuator/health" -TimeoutSec 5
     Write-Host "Application Status: $($health.status)" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Cannot connect to application" -ForegroundColor Red
@@ -195,7 +195,7 @@ if ($successRate -gt 98 -and $avgTime -lt 100) {
 
 # Save report
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$reportFile = "load-test-report-$timestamp.txt"
+$reportFile = "load-test-report-remote-$timestamp.txt"
 
 $report = @"
 Library Management System Load Test Report

@@ -48,4 +48,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.book = :book AND t.status = 'ACTIVE'")
     long countActiveTransactionsByBook(@Param("book") Book book);
+    
+    // Analytics support methods
+    long countByStatus(Transaction.TransactionStatus status);
 }

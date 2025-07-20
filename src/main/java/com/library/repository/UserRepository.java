@@ -31,4 +31,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<User> searchUsers(@Param("searchTerm") String searchTerm);
+    
+    // Analytics support methods
+    @Query("SELECT COUNT(DISTINCT u) FROM User u JOIN Transaction t ON u = t.user WHERE t.status = 'ACTIVE'")
+    long countUsersWithActiveTransactions();
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :date")
+    long countUsersByCreatedAtAfter(@Param("date") java.time.LocalDateTime date);
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt BETWEEN :startDate AND :endDate")
+    long countUsersByCreatedAtBetween(@Param("startDate") java.time.LocalDateTime startDate, 
+                                     @Param("endDate") java.time.LocalDateTime endDate);
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
+    long countByRole(@Param("role") User.Role role);
 }

@@ -1,3 +1,4 @@
+C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\service\AnalyticsService.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\dto\JwtResponseDto.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\repository\BookRepository.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\controller\AuthController.java
@@ -13,6 +14,7 @@ C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\lib
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\config\MetricsConfig.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\service\MetricsService.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\repository\TransactionRepository.java
+C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\controller\AnalyticsController.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\entity\Transaction.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\config\JwtAuthenticationFilter.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\entity\Book.java
@@ -24,3 +26,4 @@ C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\lib
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\dto\UserRegistrationDto.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\dto\BookDto.java
 C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\config\WebConfig.java
+C:\Users\gurud\Documents\SEM8\Application\Project\Monolith\src\main\java\com\library\dto\AnalyticsDashboardDto.java

@@ -47,4 +47,19 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     
     @Query("SELECT b FROM Book b WHERE b.availableCopies <= :threshold")
     List<Book> findLowStockBooks(@Param("threshold") Integer threshold);
+    
+    // Analytics support methods
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.availableCopies > :minCopies")
+    long countByAvailableCopiesGreaterThan(@Param("minCopies") int minCopies);
+    
+    @Query("SELECT SUM(b.totalCopies) FROM Book b")
+    long getTotalCopies();
+    
+    @Query("SELECT SUM(b.availableCopies) FROM Book b")
+    long getTotalAvailableCopies();
+    
+    @Query("SELECT new map(b.category as category, COUNT(b) as count) FROM Book b GROUP BY b.category")
+    List<java.util.Map<String, Object>> getBookCountByCategory();
+    
+    List<Book> findByAvailableCopiesLessThan(int threshold);
 }
