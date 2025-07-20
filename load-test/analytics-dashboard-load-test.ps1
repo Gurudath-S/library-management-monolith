@@ -335,10 +335,106 @@ function Generate-PerformanceReport {
     }
     
     # Save detailed results to CSV
-    $csvPath = "analytics-dashboard-load-test-results-$(Get-Date -Format 'yyyyMMdd-HHmmss').csv"
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $csvPath = "analytics-dashboard-load-test-results-$timestamp.csv"
+    $reportPath = "analytics-dashboard-performance-report-$timestamp.txt"
+    
     $Global:Results | Export-Csv -Path $csvPath -NoTypeInformation
+    
+    # Generate text report content
+    $reportContent = @"
+=== MONOLITHIC ARCHITECTURE PERFORMANCE REPORT ===
+Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+
+Test Configuration:
+  Concurrent Users: $ConcurrentUsers
+  Test Duration: $TestDurationMinutes minutes
+  Target Endpoint: /api/analytics/dashboard
+  Base URL: $BaseUrl
+
+Request Statistics:
+  Total Requests: $totalRequests
+  Successful Requests: $($Global:SuccessCount)
+  Failed Requests: $($Global:ErrorCount)
+  Success Rate: $successRate%
+  Throughput: $throughput requests/second
+
+Response Time Analysis:
+  Average Response Time: ${avgResponseTime}ms
+  Median Response Time: ${medianResponseTime}ms
+  Minimum Response Time: ${minResponseTime}ms
+  Maximum Response Time: ${maxResponseTime}ms
+
+Response Time Percentiles:
+  90th Percentile: ${p90}ms
+  95th Percentile: ${p95}ms
+  99th Percentile: ${p99}ms
+
+"@
+
+    # Add data analysis if available
+    if ($successfulResults.Count -gt 0) {
+        $reportContent += @"
+Data Analysis:
+  Average Response Data Size: $avgDataSize bytes
+  Average Server Execution Time: ${avgExecutionTime}ms
+  Sample Data Counts:
+    Users: $($sampleResult.UserCount)
+    Books: $($sampleResult.BookCount)
+    Transactions: $($sampleResult.TransactionCount)
+
+"@
+    }
+
+    # Add performance assessment
+    $performanceAssessment = ""
+    if ($avgResponseTime -lt 500) {
+        $performanceAssessment += "  [+] Excellent response time (< 500ms)`n"
+    } elseif ($avgResponseTime -lt 1000) {
+        $performanceAssessment += "  [!] Good response time (500-1000ms)`n"
+    } elseif ($avgResponseTime -lt 2000) {
+        $performanceAssessment += "  [!] Acceptable response time (1-2s)`n"
+    } else {
+        $performanceAssessment += "  [-] Poor response time (> 2s)`n"
+    }
+    
+    if ($successRate -gt 95) {
+        $performanceAssessment += "  [+] Excellent reliability (> 95% success rate)`n"
+    } elseif ($successRate -gt 90) {
+        $performanceAssessment += "  [!] Good reliability (90-95% success rate)`n"
+    } else {
+        $performanceAssessment += "  [-] Poor reliability (< 90% success rate)`n"
+    }
+
+    $reportContent += @"
+Performance Assessment:
+$performanceAssessment
+Architecture Notes:
+  - This test represents monolithic architecture baseline performance
+  - Data aggregation happens within single application process
+  - Database queries execute against single H2 instance
+  - No inter-service communication overhead
+  - Suitable for comparison with microservices architecture
+
+Test Environment:
+  - Spring Boot 3.3.0 application
+  - H2 in-memory database
+  - JWT authentication
+  - Test data: 48 users, 52 books, 138 transactions
+
+Files Generated:
+  - Detailed CSV results: $csvPath
+  - Performance report: $reportPath
+
+=== END OF REPORT ===
+"@
+
+    # Write report to file
+    $reportContent | Out-File -FilePath $reportPath -Encoding UTF8
+    
     Write-Host ""
     Write-Host "Detailed results saved to: $csvPath" -ForegroundColor $Green
+    Write-Host "Performance report saved to: $reportPath" -ForegroundColor $Green
     
     # Return summary for potential comparison with microservices
     return @{
@@ -393,6 +489,9 @@ try {
     
     Write-Host ""
     Write-Host "Load test completed successfully!" -ForegroundColor $Green
+    Write-Host "Files generated:" -ForegroundColor $Cyan
+    Write-Host "  - CSV data: Check the generated CSV file for detailed per-request results" -ForegroundColor $Cyan
+    Write-Host "  - Report: Check the generated TXT file for complete performance analysis" -ForegroundColor $Cyan
     Write-Host "This data can be compared with microservices architecture performance." -ForegroundColor $Cyan
     
 } catch {

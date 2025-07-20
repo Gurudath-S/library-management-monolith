@@ -118,10 +118,23 @@ python analytics_load_test.py --users 15 --duration 180 --url http://localhost:8
 ## Output Files
 
 Each test run generates:
-- **Console Report**: Comprehensive performance summary
+- **Console Report**: Comprehensive performance summary displayed in terminal
 - **CSV File**: Detailed per-request results with timestamp
+- **Text Report**: Complete performance analysis saved to file
 
-CSV filename format: `analytics-dashboard-load-test-results-YYYYMMDD-HHMMSS.csv`
+### File Naming Convention
+- CSV filename: `analytics-dashboard-load-test-results-YYYYMMDD-HHMMSS.csv`
+- Text report: `analytics-dashboard-performance-report-YYYYMMDD-HHMMSS.txt`
+
+### Text Report Contents
+The generated text report includes:
+- Test configuration and environment details
+- Complete performance statistics
+- Response time analysis and percentiles
+- Data analysis (payload sizes, execution times)
+- Performance assessment with ratings
+- Architecture-specific notes for comparison
+- File references for detailed data
 
 ## Sample Output
 
