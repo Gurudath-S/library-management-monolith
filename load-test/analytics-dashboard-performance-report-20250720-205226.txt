@@ -1,0 +1,55 @@
+﻿=== MONOLITHIC ARCHITECTURE PERFORMANCE REPORT ===
+Generated: 2025-07-20 20:52:26
+
+Test Configuration:
+  Concurrent Users: 50
+  Test Duration: 5 minutes
+  Target Endpoint: /api/analytics/dashboard
+  Base URL: http://localhost:8080
+
+Request Statistics:
+  Total Requests: 1632
+  Successful Requests: 1632
+  Failed Requests: 0
+  Success Rate: 100%
+  Throughput: 5.44 requests/second
+
+Response Time Analysis:
+  Average Response Time: 510.56ms
+  Median Response Time: 295ms
+  Minimum Response Time: 132ms
+  Maximum Response Time: 355798ms
+
+Response Time Percentiles:
+  90th Percentile: 336ms
+  95th Percentile: 356ms
+  99th Percentile: 428ms
+Data Analysis:
+  Average Response Data Size: 22531.27 bytes
+  Average Server Execution Time: 28.2ms
+  Sample Data Counts:
+    Users: 48
+    Books: 52
+    Transactions: 138
+Performance Assessment:
+  [!] Good response time (500-1000ms)
+  [+] Excellent reliability (> 95% success rate)
+
+Architecture Notes:
+  - This test represents monolithic architecture baseline performance
+  - Data aggregation happens within single application process
+  - Database queries execute against single H2 instance
+  - No inter-service communication overhead
+  - Suitable for comparison with microservices architecture
+
+Test Environment:
+  - Spring Boot 3.3.0 application
+  - H2 in-memory database
+  - JWT authentication
+  - Test data: 48 users, 52 books, 138 transactions
+
+Files Generated:
+  - Detailed CSV results: analytics-dashboard-load-test-results-20250720-205226.csv
+  - Performance report: analytics-dashboard-performance-report-20250720-205226.txt
+
+=== END OF REPORT ===
