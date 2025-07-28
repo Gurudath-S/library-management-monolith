@@ -17,86 +17,45 @@ let transactionChart = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Library Management System loading...');
-    
     // Check if user is already logged in
     const savedToken = localStorage.getItem('authToken');
     const savedUser = localStorage.getItem('currentUser');
     
     if (savedToken && savedUser) {
-        try {
-            authToken = savedToken;
-            currentUser = JSON.parse(savedUser);
-            console.log('Restored user session:', currentUser);
-            showMainSection();
-            loadDashboard();
-        } catch (error) {
-            console.error('Error restoring session:', error);
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
-        }
-    } else {
-        console.log('No saved session found');
+        authToken = savedToken;
+        currentUser = JSON.parse(savedUser);
+        showMainSection();
+        loadDashboard();
     }
 
     // Set up event listeners
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    } else {
-        console.error('Login form not found!');
-    }
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
     
     // Tab event listeners
     const tabTriggerList = [].slice.call(document.querySelectorAll('#mainTabs button'));
-    console.log('Found tabs:', tabTriggerList.length);
     tabTriggerList.forEach(function (tabTrigger) {
         tabTrigger.addEventListener('click', function (event) {
             const target = event.target.getAttribute('data-bs-target');
-            console.log('Tab clicked:', target);
             handleTabSwitch(target);
         });
     });
     
-    // Search and filter event listeners with error checking
-    const bookSearch = document.getElementById('bookSearch');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const availabilityFilter = document.getElementById('availabilityFilter');
-    
-    if (bookSearch && categoryFilter && availabilityFilter) {
-        bookSearch.addEventListener('input', applyFilters);
-        categoryFilter.addEventListener('change', applyFilters);
-        availabilityFilter.addEventListener('change', applyFilters);
-        console.log('Book filters initialized');
+    // Search and filter event listeners
+    if (document.getElementById('bookSearch')) {
+        document.getElementById('bookSearch').addEventListener('input', applyFilters);
+        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+        document.getElementById('availabilityFilter').addEventListener('change', applyFilters);
     }
     
-    const transactionSearch = document.getElementById('transactionSearch');
-    const statusFilter = document.getElementById('statusFilter');
-    
-    if (transactionSearch && statusFilter) {
-        transactionSearch.addEventListener('input', applyTransactionFilters);
-        statusFilter.addEventListener('change', applyTransactionFilters);
-        console.log('Transaction filters initialized');
+    if (document.getElementById('transactionSearch')) {
+        document.getElementById('transactionSearch').addEventListener('input', applyTransactionFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyTransactionFilters);
     }
     
-    const userSearch = document.getElementById('userSearch');
-    const roleFilter = document.getElementById('roleFilter');
-    
-    if (userSearch && roleFilter) {
-        userSearch.addEventListener('input', applyUserFilters);
-        roleFilter.addEventListener('change', applyUserFilters);
-        console.log('User filters initialized');
+    if (document.getElementById('userSearch')) {
+        document.getElementById('userSearch').addEventListener('input', applyUserFilters);
+        document.getElementById('roleFilter').addEventListener('change', applyUserFilters);
     }
-    
-    // Test Chart.js availability
-    if (typeof Chart !== 'undefined') {
-        console.log('Chart.js loaded successfully, version:', Chart.version);
-    } else {
-        console.error('Chart.js not loaded!');
-        showAlert('Charts library not loaded. Some features may not work.', 'warning');
-    }
-    
-    console.log('Application initialization complete');
 });
 
 // Authentication Functions
@@ -128,8 +87,6 @@ async function handleLogin(event) {
                 email: data.email,
                 role: data.role
             };
-            
-            console.log('Login successful, user data:', currentUser);
             
             // Save to localStorage
             localStorage.setItem('authToken', authToken);
@@ -184,9 +141,11 @@ function setupRoleBasedUI() {
     // Show/hide tabs
     const usersTab = document.getElementById('usersTabLi');
     const inventoryTab = document.getElementById('inventoryTabLi');
+    const reportsTab = document.getElementById('reportsTabLi');
     
     if (usersTab) usersTab.style.display = isLibrarian ? 'block' : 'none';
     if (inventoryTab) inventoryTab.style.display = isLibrarian ? 'block' : 'none';
+    if (reportsTab) reportsTab.style.display = isLibrarian ? 'block' : 'none';
     
     // Show/hide buttons
     const adminButtons = document.querySelectorAll('#addBookBtn, #csvImportBtn, #exportBtn');
@@ -216,349 +175,161 @@ async function apiRequest(url, options = {}) {
         }
     };
     
-    console.log(`Making API request to: ${API_BASE_URL}${url}`);
-    console.log('Request options:', { ...mergedOptions, headers: { ...mergedOptions.headers, Authorization: authToken ? 'Bearer [HIDDEN]' : 'None' } });
+    const response = await fetch(`${API_BASE_URL}${url}`, mergedOptions);
     
-    try {
-        const response = await fetch(`${API_BASE_URL}${url}`, mergedOptions);
-        console.log(`API response status: ${response.status}`);
-        
-        if (response.status === 401) {
-            console.warn('Authentication failed, logging out user');
-            logout();
-            throw new Error('Authentication required');
-        }
-        
-        return response;
-    } catch (error) {
-        console.error(`API request failed for ${url}:`, error);
-        
-        // Check if it's a network error
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            showAlert('Cannot connect to server. Please check if the backend is running.', 'danger');
-        }
-        
-        throw error;
+    if (response.status === 401) {
+        logout();
+        throw new Error('Authentication required');
     }
+    
+    return response;
 }
 
 // Tab Switching
 function handleTabSwitch(target) {
-    console.log('Tab switch requested:', target);
     switch (target) {
         case '#dashboard':
-            console.log('Loading dashboard tab');
             loadDashboard();
             break;
         case '#books':
-            console.log('Loading books tab');
             loadBooks();
             break;
         case '#transactions':
-            console.log('Loading transactions tab');
             loadTransactions();
             break;
         case '#users':
             if (currentUser.role === 'ADMIN' || currentUser.role === 'LIBRARIAN') {
-                console.log('Loading users tab');
                 loadUsers();
-            } else {
-                console.log('Access denied to users tab');
             }
             break;
         case '#inventory':
             if (currentUser.role === 'ADMIN' || currentUser.role === 'LIBRARIAN') {
-                console.log('Loading inventory tab');
                 loadInventoryData();
-            } else {
-                console.log('Access denied to inventory tab');
             }
             break;
-        default:
-            console.log('Unknown tab:', target);
+        case '#reports':
+            if (currentUser.role === 'ADMIN' || currentUser.role === 'LIBRARIAN') {
+                loadSystemAnalytics();
+            }
+            break;
     }
 }
 
 // Dashboard Functions
 async function loadDashboard() {
     try {
-        console.log('Loading dashboard for user:', currentUser?.role);
-        showAlert('Loading dashboard...', 'info');
-        
-        // Check if user has access to analytics dashboard
-        if (currentUser?.role === 'ADMIN' || currentUser?.role === 'LIBRARIAN') {
-            const response = await apiRequest('/analytics/dashboard');
-            console.log('Dashboard response status:', response.status);
-            if (response.ok) {
-                dashboardData = await response.json();
-                console.log('Dashboard data received:', dashboardData);
-                
-                // The backend returns the data, pass it directly to display function
-                displayDashboard(dashboardData);
-                showAlert('Dashboard loaded successfully!', 'success');
-            } else {
-                const errorText = await response.text();
-                console.error('Dashboard error response:', errorText);
-                showAlert(`Failed to load dashboard: ${response.status} - ${errorText}`, 'warning');
-                // Load basic dashboard for non-admin users
-                loadBasicDashboard();
-            }
+        const response = await apiRequest('/analytics/dashboard');
+        if (response.ok) {
+            dashboardData = await response.json();
+            displayDashboard(dashboardData);
         } else {
-            // Load basic dashboard for regular users
-            console.log('Loading basic dashboard for regular user');
-            loadBasicDashboard();
+            showAlert('Failed to load dashboard', 'warning');
         }
     } catch (error) {
-        console.error('Dashboard error:', error);
         showAlert(`Error loading dashboard: ${error.message}`, 'danger');
-        // Fallback to basic dashboard
-        loadBasicDashboard();
-    }
-}
-
-async function loadBasicDashboard() {
-    try {
-        // Load basic data that all users can access
-        const booksResponse = await apiRequest('/books');
-        const transactionsResponse = await apiRequest('/transactions');
-        
-        if (booksResponse.ok && transactionsResponse.ok) {
-            const books = await booksResponse.json();
-            const transactions = await transactionsResponse.json();
-            
-            // Create basic dashboard data
-            const basicData = {
-                bookAnalytics: {
-                    totalBooks: books.length,
-                    availableBooks: books.filter(book => book.availableCopies > 0).length,
-                    booksByCategory: [],
-                    mostBorrowedBooks: []
-                },
-                userAnalytics: {
-                    activeBorrowers: 0
-                },
-                transactionAnalytics: {
-                    overdueTransactions: transactions.filter(t => t.status === 'OVERDUE').length,
-                    recentTransactions: transactions.slice(0, 5),
-                    transactionTrends: []
-                }
-            };
-            
-            displayDashboard(basicData);
-            showAlert('Dashboard loaded!', 'success');
-        } else {
-            // Even more basic fallback
-            displayDashboard({
-                bookAnalytics: { totalBooks: 0, availableBooks: 0, booksByCategory: [], mostBorrowedBooks: [] },
-                userAnalytics: { activeBorrowers: 0 },
-                transactionAnalytics: { overdueTransactions: 0, recentTransactions: [], transactionTrends: [] }
-            });
-            showAlert('Basic dashboard loaded', 'info');
-        }
-    } catch (error) {
-        console.error('Basic dashboard error:', error);
-        // Ultra basic fallback
-        displayDashboard({
-            bookAnalytics: { totalBooks: 0, availableBooks: 0, booksByCategory: [], mostBorrowedBooks: [] },
-            userAnalytics: { activeBorrowers: 0 },
-            transactionAnalytics: { overdueTransactions: 0, recentTransactions: [], transactionTrends: [] }
-        });
-        showAlert('Dashboard initialized', 'info');
     }
 }
 
 function displayDashboard(data) {
-    console.log('Displaying dashboard with data:', data);
-    
-    // Update stats cards with correct property mapping
+    // Update stats cards
     const totalBooksEl = document.getElementById('totalBooksCount');
     const availableBooksEl = document.getElementById('availableBooksCount');
     const activeBorrowersEl = document.getElementById('activeBorrowersCount');
     const overdueEl = document.getElementById('overdueCount');
     
-    // Map the backend data structure to frontend elements
-    if (totalBooksEl) totalBooksEl.textContent = data?.dashboard?.bookAnalytics?.totalBooks || data?.bookAnalytics?.totalBooks || 0;
-    if (availableBooksEl) availableBooksEl.textContent = data?.dashboard?.bookAnalytics?.availableBooks || data?.bookAnalytics?.availableBooks || 0;
-    if (activeBorrowersEl) activeBorrowersEl.textContent = data?.dashboard?.userAnalytics?.activeUsers || data?.userAnalytics?.activeBorrowers || 0;
-    if (overdueEl) overdueEl.textContent = data?.dashboard?.transactionAnalytics?.overdueTransactions || data?.transactionAnalytics?.overdueTransactions || 0;
+    if (totalBooksEl) totalBooksEl.textContent = data.bookAnalytics?.totalBooks || 0;
+    if (availableBooksEl) availableBooksEl.textContent = data.bookAnalytics?.availableBooks || 0;
+    if (activeBorrowersEl) activeBorrowersEl.textContent = data.userAnalytics?.activeBorrowers || 0;
+    if (overdueEl) overdueEl.textContent = data.transactionAnalytics?.overdueTransactions || 0;
     
-    // Prepare chart data from backend response
-    const categoryData = prepareChartData(data?.dashboard?.bookAnalytics?.booksByCategory || data?.bookAnalytics?.booksByCategory);
-    const trendData = prepareTrendData(data?.dashboard?.transactionAnalytics?.recentActivity || data?.transactionAnalytics?.transactionTrends);
-    
-    // Create charts with processed data
-    createCategoryChart(categoryData);
-    createTransactionChart(trendData);
+    // Create charts
+    createCategoryChart(data.bookAnalytics?.booksByCategory || []);
+    createTransactionChart(data.transactionAnalytics?.transactionTrends || []);
     
     // Display popular books
-    displayPopularBooks(data?.dashboard?.bookAnalytics?.mostBorrowedBooks || data?.bookAnalytics?.mostBorrowedBooks || []);
+    displayPopularBooks(data.bookAnalytics?.mostBorrowedBooks || []);
     
-    // Display recent activities (convert from backend format)
-    const recentActivities = convertToRecentActivities(data?.dashboard?.transactionAnalytics?.recentActivity || []);
-    displayRecentActivities(recentActivities);
-}
-
-// Helper function to convert backend category data to chart format
-function prepareChartData(categoryData) {
-    if (!categoryData) return [];
-    
-    // If it's an object (backend format), convert to array
-    if (typeof categoryData === 'object' && !Array.isArray(categoryData)) {
-        return Object.entries(categoryData).map(([category, count]) => ({
-            category,
-            count
-        }));
-    }
-    
-    // If it's already an array, return as is
-    return categoryData;
-}
-
-// Helper function to convert backend trend data to chart format
-function prepareTrendData(trendData) {
-    if (!trendData) return [];
-    
-    return trendData.map(item => ({
-        date: item.date,
-        borrowed: item.borrowings || item.borrowed || 0,
-        returned: item.returns || item.returned || 0
-    }));
-}
-
-// Helper function to convert recent activity data
-function convertToRecentActivities(recentActivity) {
-    if (!recentActivity || recentActivity.length === 0) return [];
-    
-    // Convert the recent activity format to what the UI expects
-    return recentActivity.slice(0, 5).map((activity, index) => ({
-        bookTitle: `Recent Activity ${index + 1}`,
-        action: `${activity.borrowings || 0} borrowed, ${activity.returns || 0} returned`,
-        userName: 'System',
-        date: activity.date
-    }));
+    // Display recent activities
+    displayRecentActivities(data.transactionAnalytics?.recentTransactions || []);
 }
 
 function createCategoryChart(categoryData) {
     const chartEl = document.getElementById('categoryChart');
-    if (!chartEl) {
-        console.warn('categoryChart element not found');
-        return;
+    if (!chartEl) return;
+    
+    const ctx = chartEl.getContext('2d');
+    
+    if (categoryChart) {
+        categoryChart.destroy();
     }
     
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js not loaded');
-        return;
-    }
-    
-    try {
-        const ctx = chartEl.getContext('2d');
-        
-        if (categoryChart) {
-            categoryChart.destroy();
-        }
-        
-        if (!categoryData || categoryData.length === 0) {
-            // Display empty state
-            ctx.clearRect(0, 0, chartEl.width, chartEl.height);
-            ctx.font = '16px Arial';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText('No category data available', chartEl.width / 2, chartEl.height / 2);
-            return;
-        }
-        
-        categoryChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: categoryData.map(item => item.category),
-                datasets: [{
-                    data: categoryData.map(item => item.count),
-                    backgroundColor: [
-                        '#3498db', '#e74c3c', '#f39c12', '#27ae60', 
-                        '#9b59b6', '#34495e', '#1abc9c', '#e67e22'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+    categoryChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryData.map(item => item.category),
+            datasets: [{
+                data: categoryData.map(item => item.count),
+                backgroundColor: [
+                    '#3498db', '#e74c3c', '#f39c12', '#27ae60', 
+                    '#9b59b6', '#34495e', '#1abc9c', '#e67e22'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
                 }
             }
-        });
-    } catch (error) {
-        console.error('Error creating category chart:', error);
-    }
+        }
+    });
 }
 
 function createTransactionChart(trendData) {
     const chartEl = document.getElementById('transactionChart');
-    if (!chartEl) {
-        console.warn('transactionChart element not found');
-        return;
+    if (!chartEl) return;
+    
+    const ctx = chartEl.getContext('2d');
+    
+    if (transactionChart) {
+        transactionChart.destroy();
     }
     
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js not loaded');
-        return;
-    }
-    
-    try {
-        const ctx = chartEl.getContext('2d');
-        
-        if (transactionChart) {
-            transactionChart.destroy();
-        }
-        
-        if (!trendData || trendData.length === 0) {
-            // Display empty state
-            ctx.clearRect(0, 0, chartEl.width, chartEl.height);
-            ctx.font = '16px Arial';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText('No transaction data available', chartEl.width / 2, chartEl.height / 2);
-            return;
-        }
-        
-        transactionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: trendData.map(item => item.date),
-                datasets: [{
-                    label: 'Books Borrowed',
-                    data: trendData.map(item => item.borrowed),
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: 'Books Returned',
-                    data: trendData.map(item => item.returned),
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
-                    tension: 0.4
-                }]
+    transactionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trendData.map(item => item.date),
+            datasets: [{
+                label: 'Books Borrowed',
+                data: trendData.map(item => item.borrowed),
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Books Returned',
+                data: trendData.map(item => item.returned),
+                borderColor: '#27ae60',
+                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    } catch (error) {
-        console.error('Error creating transaction chart:', error);
-    }
+        }
+    });
 }
 
 function displayPopularBooks(books) {
@@ -586,7 +357,7 @@ function displayRecentActivities(activities) {
     const container = document.getElementById('recentActivitiesContainer');
     if (!container) return;
     
-    if (!activities || activities.length === 0) {
+    if (activities.length === 0) {
         container.innerHTML = '<p class="text-muted">No recent activities</p>';
         return;
     }
@@ -594,8 +365,8 @@ function displayRecentActivities(activities) {
     container.innerHTML = activities.map(activity => `
         <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
             <div>
-                <strong>${escapeHtml(activity.bookTitle || 'System Activity')}</strong>
-                <small class="text-muted d-block">${activity.action || 'Activity'} ${activity.userName ? 'by ' + escapeHtml(activity.userName) : ''}</small>
+                <strong>${escapeHtml(activity.bookTitle)}</strong>
+                <small class="text-muted d-block">${activity.action} by ${escapeHtml(activity.userName)}</small>
             </div>
             <small class="text-muted">${formatDate(activity.date)}</small>
         </div>
@@ -610,24 +381,16 @@ function refreshDashboard() {
 // Books Functions
 async function loadBooks() {
     try {
-        console.log('Loading books...');
-        showAlert('Loading books...', 'info');
         const response = await apiRequest('/books');
-        console.log('Books response status:', response.status);
         if (response.ok) {
             allBooks = await response.json();
             filteredBooks = [...allBooks];
-            console.log(`Loaded ${allBooks.length} books`);
             displayBooks(filteredBooks);
             populateFilterOptions();
-            showAlert(`${allBooks.length} books loaded successfully!`, 'success');
         } else {
-            const errorText = await response.text();
-            console.error('Books error response:', errorText);
-            showAlert(`Failed to load books: ${response.status} - ${errorText}`, 'warning');
+            showAlert('Failed to load books', 'warning');
         }
     } catch (error) {
-        console.error('Books loading error:', error);
         showAlert(`Error loading books: ${error.message}`, 'danger');
     }
 }
@@ -902,6 +665,59 @@ function displayInventoryData(data) {
             </td>
         </tr>
     `).join('');
+}
+
+// Reports Functions
+async function loadSystemAnalytics() {
+    if (!canManageBooks()) return;
+    
+    try {
+        const response = await apiRequest('/analytics/reports');
+        if (response.ok) {
+            const analyticsData = await response.json();
+            displaySystemAnalytics(analyticsData);
+        } else {
+            showAlert('Failed to load system analytics', 'warning');
+        }
+    } catch (error) {
+        showAlert(`Error loading analytics: ${error.message}`, 'danger');
+    }
+}
+
+function displaySystemAnalytics(data) {
+    const container = document.getElementById('analyticsContainer');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Book Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Books:</strong> ${data.totalBooks || 0}</p>
+                        <p><strong>Available Books:</strong> ${data.availableBooks || 0}</p>
+                        <p><strong>Most Popular Category:</strong> ${data.popularCategory || 'N/A'}</p>
+                        <p><strong>Average Books per Category:</strong> ${data.avgBooksPerCategory || 0}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>User Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Users:</strong> ${data.totalUsers || 0}</p>
+                        <p><strong>Active Borrowers:</strong> ${data.activeBorrowers || 0}</p>
+                        <p><strong>Average Books per User:</strong> ${data.avgBooksPerUser || 0}</p>
+                        <p><strong>Most Active User:</strong> ${data.mostActiveUser || 'N/A'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // Modal Functions
@@ -1280,11 +1096,9 @@ function getRoleBadgeClass(role) {
 }
 
 function showAlert(message, type = 'info') {
-    console.log(`Alert [${type.toUpperCase()}]: ${message}`);
-    
     const alertContainer = document.getElementById('alertContainer');
     if (!alertContainer) {
-        console.warn('Alert container not found, using console only');
+        console.log(`${type.toUpperCase()}: ${message}`);
         return;
     }
     
