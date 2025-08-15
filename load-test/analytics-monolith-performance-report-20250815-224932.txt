@@ -1,0 +1,52 @@
+﻿=== MONOLITHIC ARCHITECTURE PERFORMANCE REPORT ===
+Generated: 2025-08-15 22:49:33
+
+Test Configuration:
+  Concurrent Users: 50
+  Test Duration: 5 minutes
+  Max Concurrent Jobs: 25
+  Target Endpoint: /api/analytics/dashboard
+  Base URL: http://localhost:8080
+  Warmup Requests: 5
+
+Request Statistics:
+  Total Requests: 1774
+  Successful Requests: 1774
+  Failed Requests: 0
+  Success Rate: 100%
+  Throughput: 5.91 requests/second
+
+Response Time Analysis:
+  Average Response Time: 283.66ms
+  Median Response Time: 277ms
+  Minimum Response Time: 143ms
+  Maximum Response Time: 516ms
+
+Response Time Percentiles:
+  90th Percentile: 352ms
+  95th Percentile: 381ms
+  99th Percentile: 444ms
+
+Data Analysis:
+  Average Response Data Size: 1868.3 bytes
+  Performance Assessment:  [+] Good response time for microservices (< 1s)
+  [+] Excellent reliability (> 95% success rate)
+
+Test Environment:
+  - Spring Boot 3.3.0 microservices
+  - Docker containerized deployment
+  - H2 in-memory databases per service
+  - JWT authentication with token propagation
+  - Feign clients for inter-service communication
+
+Memory Optimization Applied:
+  - Job throttling with max 25 concurrent jobs
+  - ArrayList for better memory management
+  - Explicit garbage collection
+  - Proper job cleanup and resource management
+
+Comparison Baseline:
+  - Compare these results with microservices architecture
+  - Expected lower latency due to no network overhead
+
+=== END OF REPORT ===
