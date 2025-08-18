@@ -1,17 +1,196 @@
 # Library Management System - Monolithic Architecture
 
-A sophisticated Java Spring Boot monolithic application for library operations, designed as a comprehensive architectural case study demonstrating modern enterprise application development patterns and practices.
+A Spring Boot monolithic application demonstrating layered architecture patterns for library operations with cross-module analytics.
 
-## 🎯 Project Overview
+## 🏗️ Architecture Overview
 
-This application serves as a **reference implementation** showcasing the monolithic architectural pattern with:
-- Modern Spring Boot 3.x framework implementation
-- Comprehensive business domain modeling
-- Advanced security and authentication patterns
-- Cross-module analytics demonstrating monolithic advantages
-- Production-ready patterns and practices
+### Architectural Pattern: **Layered Monolithic Architecture**
 
-The project demonstrates enterprise-grade software architecture principles including layered architecture, dependency injection, transaction management, and comprehensive business rule enforcement.
+```
+┌─────────────────────────────────────────────┐
+│              Presentation Layer             │
+│         (REST Controllers + DTOs)           │
+├─────────────────────────────────────────────┤
+│               Business Layer                │
+│            (Service Classes)                │
+├─────────────────────────────────────────────┤
+│               Data Access Layer             │
+│          (Repository Interfaces)            │
+├─────────────────────────────────────────────┤
+│              Persistence Layer              │
+│            (JPA Entities + DB)              │
+└─────────────────────────────────────────────┘
+```
+
+### Core Business Domains
+
+1. **Authentication Domain** - User authentication and JWT token management
+2. **User Management Domain** - User profiles and role-based access control
+3. **Book Catalog Domain** - Book inventory and catalog management
+4. **Transaction Management Domain** - Borrowing and return workflows
+5. **Analytics Domain** - Cross-domain data aggregation and reporting
+
+## 🛠️ Technology Stack
+
+### Core Framework
+- **Spring Boot**: 3.3.0
+- **Java**: 22
+- **Database**: H2 (in-memory)
+- **Build Tool**: Maven
+
+### Spring Modules
+- **Spring Web MVC**: REST API layer
+- **Spring Data JPA**: Data persistence layer
+- **Spring Security**: Authentication and authorization
+- **Spring Validation**: Input validation
+- **Spring Boot Actuator**: Application monitoring
+
+### Security & Data
+- **JWT**: Stateless authentication tokens
+- **BCrypt**: Password encryption
+- **Hibernate**: ORM implementation
+- **HikariCP**: Database connection pooling
+
+## 📁 Component Architecture
+
+```
+com.library/
+├── controller/                      # Presentation Layer
+│   ├── AuthController               # Authentication endpoints
+│   ├── UserController              # User management APIs  
+│   ├── BookController              # Book catalog APIs
+│   ├── TransactionController       # Transaction APIs
+│   └── AnalyticsController         # Analytics APIs
+│
+├── service/                         # Business Logic Layer
+│   ├── UserService                 # User domain logic
+│   ├── BookService                 # Book domain logic
+│   ├── TransactionService          # Transaction workflow
+│   ├── AnalyticsService            # Cross-domain analytics
+│   └── MetricsService              # Application metrics
+│
+├── repository/                      # Data Access Layer
+│   ├── UserRepository              # User data operations
+│   ├── BookRepository              # Book data operations
+│   └── TransactionRepository       # Transaction data operations
+│
+├── entity/                          # Domain Model
+│   ├── User                        # User entity
+│   ├── Book                        # Book entity
+│   └── Transaction                 # Transaction entity
+│
+├── dto/                            # Data Transfer Objects
+│   ├── LoginDto                    # Authentication DTOs
+│   ├── UserRegistrationDto         # User DTOs
+│   ├── BookDto                     # Book DTOs
+│   └── AnalyticsDashboardDto       # Analytics DTOs
+│
+└── config/                         # Configuration Layer
+    ├── SecurityConfig              # Security configuration
+    ├── JwtAuthenticationFilter     # JWT filter
+    └── DataInitializer            # Data setup
+```
+
+## 🔄 Component Interactions
+
+### Authentication Flow
+1. **AuthController** → **UserService** → **UserRepository**
+2. **JwtAuthenticationFilter** → **JWT Token Validation**
+3. **SecurityConfig** → **Role-based Access Control**
+
+### Business Operations Flow
+1. **Controllers** → **Service Layer** → **Repository Layer** → **Database**
+2. **Cross-cutting**: Security, Validation, Transaction Management
+3. **Analytics**: **AnalyticsService** → Multiple Repositories → Aggregated Response
+
+### Data Flow Pattern
+- **Request** → **Controller** → **DTO Validation** → **Service** → **Repository** → **Entity** → **Database**
+- **Response** → **Database** → **Entity** → **Repository** → **Service** → **DTO** → **Controller**
+
+## 🎯 Key Architectural Patterns
+
+### Design Patterns Implemented
+- **Layered Architecture**: Clear separation of concerns
+- **Repository Pattern**: Data access abstraction
+- **DTO Pattern**: Data transfer object pattern
+- **Service Layer Pattern**: Business logic encapsulation
+- **Dependency Injection**: Spring IoC container
+- **MVC Pattern**: Model-View-Controller for web layer
+
+### Spring Framework Patterns
+- **Auto Configuration**: Spring Boot starters
+- **Aspect-Oriented Programming**: Cross-cutting concerns
+- **Transaction Management**: Declarative transactions
+- **Security Integration**: Method-level authorization
+
+## 🔐 Security Architecture
+
+### Authentication Components
+- **JWT Token Provider**: Token generation and validation
+- **Password Encoder**: BCrypt implementation
+- **Authentication Filter**: Request interception and validation
+- **User Details Service**: User authentication data loading
+
+### Authorization Layers
+- **Method Security**: @PreAuthorize annotations
+- **Role-based Access**: USER, LIBRARIAN, ADMIN roles
+- **Endpoint Security**: URL-based access control
+- **CORS Configuration**: Cross-origin request handling
+
+## 📊 Cross-Module Integration
+
+### Analytics Module Integration
+The **AnalyticsService** demonstrates monolithic architecture advantages through:
+- **Direct Method Calls**: Zero-latency service-to-service communication
+- **Shared Database**: Single transaction across multiple entities
+- **Unified Error Handling**: Centralized exception management
+- **Real-time Data Access**: Live cross-domain data aggregation
+
+### Service Dependencies
+- **AnalyticsService** → **UserService**, **BookService**, **TransactionService**
+- **TransactionService** → **UserService**, **BookService**
+- **All Services** → **Respective Repositories**
+- **Security Layer** → **All Controllers and Services**
+
+## 🚀 API Layer Architecture
+
+### REST Endpoint Structure
+```
+/api/auth/*          - Authentication endpoints
+/api/users/*         - User management endpoints  
+/api/books/*         - Book catalog endpoints
+/api/transactions/*  - Transaction management endpoints
+/api/analytics/*     - Cross-domain analytics endpoints
+/api/actuator/*      - System monitoring endpoints
+```
+
+### HTTP Method Mapping
+- **GET**: Read operations (list, search, retrieve)
+- **POST**: Create operations (register, login, borrow, create)
+- **PUT**: Update operations (profile, book details, inventory)
+- **DELETE**: Remove operations (books, users - role restricted)
+
+### Response Format
+- **Success**: JSON with data payload
+- **Error**: JSON with error message and HTTP status codes
+- **Authentication**: JWT Bearer tokens in headers
+- **Validation**: Jakarta Validation with error details
+
+## 💾 Data Architecture
+
+### Database Design
+- **Single Database**: H2 in-memory database
+- **Entity Relationships**: JPA-managed relationships
+- **Transaction Management**: Single database transactions
+- **Connection Pooling**: HikariCP for connection management
+
+### Data Access Pattern
+- **Repository Interfaces**: Spring Data JPA
+- **Custom Queries**: @Query annotations for complex operations
+- **Audit Fields**: Automated timestamp management
+- **Transaction Boundaries**: Service-level transaction management
+
+This architecture provides a foundation for understanding monolithic patterns and demonstrates efficient cross-module communication within a single deployable unit.
 
 ## 🏗️ Architecture Overview
 
